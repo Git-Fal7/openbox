@@ -21,3 +21,10 @@ Copyright (C) 2002  Dana Jansens
 
     See the COPYING file for a copy of the GNU General Public License.
 
+-#-
+building
+
+./bootstrap
+./configure --prefix=/usr --sysconfdir=/etc
+make
+sudo make install
