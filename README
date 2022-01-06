@@ -28,3 +28,13 @@ building
 ./configure --prefix=/usr --sysconfdir=/etc
 make
 sudo make install
+-#-
+patches
+snap windows (emilypeto)
+replacing the python script with a c file (pcmanfm)
+
+todo
+remove multiple desktops
+remove rootmenu
+remove the requiring of xml files
+snap window has some issue with vertical stuff using horzonital mode
