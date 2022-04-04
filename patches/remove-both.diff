@@ -1,0 +1,947 @@
+diff --git a/Makefile.am b/Makefile.am
+index f25bf8e..205efb2 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -6,8 +6,6 @@ localedir       = $(datadir)/locale
+ configdir       = $(sysconfdir)/xdg
+ rcdir           = $(configdir)/openbox
+ xsessionsdir    = $(datadir)/xsessions
+-gnomesessiondir = $(datadir)/gnome-session/sessions
+-gnomewmfilesdir = $(datadir)/gnome/wm-properties
+ pkgconfigdir    = $(libdir)/pkgconfig
+ obtpubincludedir= $(includedir)/openbox/@OBT_VERSION@/obt
+ rrpubincludedir = $(includedir)/openbox/@RR_VERSION@/obrender
+@@ -32,17 +30,13 @@ lib_LTLIBRARIES = \
+ 
+ bin_PROGRAMS = \
+ 	openbox/openbox \
+-	tools/gdm-control/gdm-control \
+-	tools/gnome-panel-control/gnome-panel-control \
+ 	tools/obxprop/obxprop
+ 
+ noinst_PROGRAMS = \
+ 	obt/obt_unittests
+ 
+ nodist_bin_SCRIPTS = \
+-	data/xsession/openbox-session \
+-	data/xsession/openbox-gnome-session \
+-	data/xsession/openbox-kde-session
++	data/xsession/openbox-session
+ 
+ dist_rc_SCRIPTS = \
+ 	data/environment
+@@ -328,15 +322,6 @@ obt_obt_unittests_SOURCES = \
+ 	obt/unittest_base.c \
+ 	obt/bsearch_unittest.c
+ 
+-## gnome-panel-control ##
+-
+-tools_gnome_panel_control_gnome_panel_control_CPPFLAGS = \
+-	$(X_CFLAGS)
+-tools_gnome_panel_control_gnome_panel_control_LDADD = \
+-	$(X_LIBS)
+-tools_gnome_panel_control_gnome_panel_control_SOURCES = \
+-	tools/gnome-panel-control/gnome-panel-control.c
+-
+ ## obxprop ##
+ 
+ tools_obxprop_obxprop_CPPFLAGS = \
+@@ -348,20 +333,6 @@ tools_obxprop_obxprop_LDADD = \
+ tools_obxprop_obxprop_SOURCES = \
+ 	tools/obxprop/obxprop.c
+ 
+-## gdm-control ##
+-
+-tools_gdm_control_gdm_control_CPPFLAGS = \
+-	$(XAUTH_CFLAGS) \
+-	$(X_CFLAGS) \
+-	$(GLIB_CFLAGS)
+-tools_gdm_control_gdm_control_LDADD = \
+-	$(XAUTH_LIBS) \
+-	$(X_LIBS) \
+-	$(GLIB_LIBS)
+-tools_gdm_control_gdm_control_SOURCES = \
+-	tools/gdm-control/gdm-control.c
+-
+-
+ ## default button masks ##
+ dist_docxbm_DATA = \
+         data/xbm/bullet.xbm \
+@@ -531,17 +502,8 @@ data/autostart/openbox-autostart: $(top_srcdir)/data/autostart/openbox-autostart
+ 	@echo make: creating $@
+ 	@$(edit) $< >$@	
+ 
+-dist_gnomewmfiles_DATA = \
+-	data/gnome-wm-properties/openbox.desktop
+-
+ nodist_xsessions_DATA = \
+-	data/xsession/openbox.desktop \
+-	data/xsession/openbox-gnome.desktop \
+-	data/xsession/openbox-kde.desktop
+-
+-dist_gnomesession_DATA = \
+-	data/gnome-session/openbox-gnome.session \
+-	data/gnome-session/openbox-gnome-fallback.session
++	data/xsession/openbox.desktop
+ 
+ dist_noinst_DATA = \
+ 	data/rc.xsd \
+@@ -549,19 +511,11 @@ dist_noinst_DATA = \
+ 	data/autostart/autostart.in \
+ 	data/autostart/openbox-autostart.in \
+ 	data/xsession/openbox.desktop.in \
+-	data/xsession/openbox-gnome.desktop.in \
+-	data/xsession/openbox-kde.desktop.in \
+ 	data/xsession/openbox-session.in \
+-	data/xsession/openbox-gnome-session.in \
+-	data/xsession/openbox-kde-session.in \
+ 	doc/openbox.1.sgml \
+ 	doc/openbox.1.in \
+ 	doc/openbox-session.1.sgml \
+ 	doc/openbox-session.1.in \
+-	doc/openbox-gnome-session.1.sgml \
+-	doc/openbox-gnome-session.1.in \
+-	doc/openbox-kde-session.1.sgml \
+-	doc/openbox-kde-session.1.in \
+ 	doc/obxprop.1.sgml \
+ 	doc/obxprop.1.in \
+ 	obrender/version.h.in \
+@@ -599,8 +553,6 @@ dist_doc_DATA = \
+ nodist_man_MANS = \
+ 	doc/openbox.1 \
+ 	doc/openbox-session.1 \
+-	doc/openbox-gnome-session.1 \
+-	doc/openbox-kde-session.1 \
+ 	doc/obxprop.1
+ 
+ EXTRA_DIST = \
+diff --git a/data/gnome-session/Makefile b/home/faleh/openbox/data/gnome-session/Makefile
+deleted file mode 100644
+index b90edac..0000000
+--- a/data/gnome-session/Makefile
++++ /dev/null
+@@ -1,4 +0,0 @@
+-all clean install:
+-	$(MAKE) -C .. -$(MAKEFLAGS) $@
+-
+-.PHONY: all clean install
+diff --git a/data/gnome-session/openbox-gnome-fallback.session b/home/faleh/openbox/data/gnome-session/openbox-gnome-fallback.session
+deleted file mode 100644
+index 0909fa7..0000000
+--- a/data/gnome-session/openbox-gnome-fallback.session
++++ /dev/null
+@@ -1,4 +0,0 @@
+-[GNOME Session]
+-Name=GNOME/Openbox fallback (Safe Mode)
+-RequiredComponents=openbox;gnome-settings-daemon
+-DesktopName=GNOME
+diff --git a/data/gnome-session/openbox-gnome.session b/home/faleh/openbox/data/gnome-session/openbox-gnome.session
+deleted file mode 100644
+index ffeccdb..0000000
+--- a/data/gnome-session/openbox-gnome.session
++++ /dev/null
+@@ -1,4 +0,0 @@
+-[GNOME Session]
+-Name=GNOME/Openbox
+-RequiredComponents=openbox;gnome-settings-daemon;gnome-panel;nautilus-classic;gnome-flashback-services
+-DesktopName=GNOME
+diff --git a/data/gnome-wm-properties/Makefile b/home/faleh/openbox/data/gnome-wm-properties/Makefile
+deleted file mode 100644
+index b90edac..0000000
+--- a/data/gnome-wm-properties/Makefile
++++ /dev/null
+@@ -1,4 +0,0 @@
+-all clean install:
+-	$(MAKE) -C .. -$(MAKEFLAGS) $@
+-
+-.PHONY: all clean install
+diff --git a/data/gnome-wm-properties/openbox.desktop b/home/faleh/openbox/data/gnome-wm-properties/openbox.desktop
+deleted file mode 100644
+index 67e49e4..0000000
+--- a/data/gnome-wm-properties/openbox.desktop
++++ /dev/null
+@@ -1,13 +0,0 @@
+-[Desktop Entry]
+-Type=Application
+-Name=Openbox
+-Exec=openbox
+-
+-# name we put on the WM spec check window
+-X-GNOME-WMName=Openbox
+-
+-# our config tool
+-ConfigExec=obconf
+-
+-[Window Manager]
+-SessionManaged=true
+diff --git a/data/xsession/openbox-gnome-session.in b/home/faleh/openbox/data/xsession/openbox-gnome-session.in
+deleted file mode 100644
+index f31c9ad..0000000
+--- a/data/xsession/openbox-gnome-session.in
++++ /dev/null
+@@ -1,66 +0,0 @@
+-#!/bin/sh
+-
+-if test -n "$1"; then
+-    echo "Syntax: openbox-gnome-session"
+-    echo
+-    echo "See the openbox-gnome-session(1) manpage for help."
+-  exit
+-fi
+-
+-# Clean up after GDM
+-xprop -root -remove _NET_NUMBER_OF_DESKTOPS \
+-      -remove _NET_DESKTOP_NAMES \
+-      -remove _NET_CURRENT_DESKTOP 2> /dev/null
+-
+-VER=$(gnome-session --version 2>/dev/null | \
+-      sed -e 's/[^0-9.]*\([0-9.]\+\)/\1/')
+-
+-MAJOR=$(echo $VER | cut -d . -f 1)
+-MINOR=$(echo $VER | cut -d . -f 2)
+-
+-# run GNOME with Openbox as its window manager
+-
+-if test $MAJOR -lt 2 || (test $MAJOR = 2 && test $MINOR -le 22); then
+-  # older gnome-session was easy to work with
+-  export WINDOW_MANAGER="@bindir@/openbox"
+-  exec gnome-session --choose-session=openbox-session "$@"
+-elif test $MAJOR -lt 3; then
+-  # old gnome-session requires openbox to be set in gconf and an
+-  # openbox.desktop to be installed in the applications directory
+-
+-  SPATH=/desktop/gnome/session
+-
+-  # get the current default session
+-  SESSION=$(gconftool-2 -g $SPATH/default_session 2> /dev/null)
+-
+-  # make sure openbox is going to be run
+-  if test -z "$SESSION"; then
+-      # if its empty then just run openbox
+-      SESSION="[openbox]"
+-  elif ! echo "$SESSION" | grep -q openbox; then
+-      # if openbox isn't in the session then append it
+-      SESSION="${SESSION%]},openbox]"
+-  fi
+-
+-  # get the current GNOME/Openbox session
+-  OB_SESSION=$(gconftool-2 -g $SPATH/openbox_session 2> /dev/null)
+-
+-  # update the GNOME/Openbox session if needed
+-  if test x$OB_SESSION != x$SESSION; then
+-      # the default session changed or we didn't run GNOME/Openbox before
+-      gconftool-2 -t list --list-type=strings -s $SPATH/openbox_session \
+-        "$SESSION" 2> /dev/null
+-  fi
+-
+-  # run GNOME/Openbox
+-  exec gnome-session --default-session-key $SPATH/openbox_session "$@"
+-else
+-  # new gnome-session requires session file installed in
+-  # /usr/share/gnome-session/sessions as well as openbox.desktop to be
+-  # installed in the applications directory
+-
+-  exec gnome-session --session=openbox-gnome
+-fi
+-
+-
+-
+diff --git a/data/xsession/openbox-gnome.desktop.in b/home/faleh/openbox/data/xsession/openbox-gnome.desktop.in
+deleted file mode 100644
+index 24931b5..0000000
+--- a/data/xsession/openbox-gnome.desktop.in
++++ /dev/null
+@@ -1,7 +0,0 @@
+-[Desktop Entry]
+-Name=GNOME/Openbox
+-Comment=Use the Openbox window manager inside of the GNOME desktop environment
+-Exec=@bindir@/openbox-gnome-session
+-TryExec=gnome-session
+-Icon=openbox
+-Type=Application
+diff --git a/data/xsession/openbox-kde-session.in b/home/faleh/openbox/data/xsession/openbox-kde-session.in
+deleted file mode 100644
+index 3572279..0000000
+--- a/data/xsession/openbox-kde-session.in
++++ /dev/null
+@@ -1,20 +0,0 @@
+-#!/bin/sh
+-
+-if test -n "$1"; then
+-    echo "Syntax: openbox-kde-session"
+-    echo
+-    echo "See the openbox-kde-session(1) manpage for help."
+-  exit
+-fi
+-
+-# Set the prefix for the menu layout to use
+-export XDG_MENU_PREFIX="kde-4-"
+-
+-# Clean up after GDM
+-xprop -root -remove _NET_NUMBER_OF_DESKTOPS \
+-      -remove _NET_DESKTOP_NAMES \
+-      -remove _NET_CURRENT_DESKTOP 2> /dev/null
+-
+-# Run KDE with Openbox as its window manager
+-export KDEWM="@bindir@/openbox"
+-exec startkde "$@"
+diff --git a/data/xsession/openbox-kde.desktop.in b/home/faleh/openbox/data/xsession/openbox-kde.desktop.in
+deleted file mode 100644
+index bc78a97..0000000
+--- a/data/xsession/openbox-kde.desktop.in
++++ /dev/null
+@@ -1,7 +0,0 @@
+-[Desktop Entry]
+-Name=KDE/Openbox
+-Comment=Use the Openbox window manager inside of the K Desktop Environment
+-Exec=@bindir@/openbox-kde-session
+-TryExec=startkde
+-Icon=openbox
+-Type=Application
+diff --git a/doc/openbox-gnome-session.1.in b/home/faleh/openbox/doc/openbox-gnome-session.1.in
+deleted file mode 100644
+index 7256874..0000000
+--- a/doc/openbox-gnome-session.1.in
++++ /dev/null
+@@ -1,22 +0,0 @@
+-.TH "OPENBOX" "1" 
+-.SH "NAME" 
+-openbox-gnome-session \(em Run a GNOME session with Openbox as the window manager 
+- 
+-.SH "DESCRIPTION" 
+-.PP 
+-\fBopenbox-gnome-session\fR runs a GNOME session with 
+-Openbox as the window manager. 
+-.PP 
+-\fBopenbox-gnome-session\fR does not take any command line 
+-arguments. 
+-.SH "SEE ALSO" 
+-.PP 
+-openbox(1), openbox-kde-session(1), openbox-session(1). 
+- 
+-.PP 
+-The program's full documentation is available on the website: 
+-\fBhttp://openbox.org/\fP 
+-.PP 
+-Please report bugs to: \fBhttp://bugzilla.icculus.org/ 
+-\fP 
+-.\" created by instant / docbook-to-man, Wed 06 Jan 2010, 13:40 
+diff --git a/doc/openbox-gnome-session.1.sgml b/home/faleh/openbox/doc/openbox-gnome-session.1.sgml
+deleted file mode 100644
+index 66add1b..0000000
+--- a/doc/openbox-gnome-session.1.sgml
++++ /dev/null
+@@ -1,76 +0,0 @@
+-<!doctype refentry PUBLIC "-//OASIS//DTD DocBook V4.1//EN" [
+-
+-<!-- Process this file with docbook-to-man to generate an nroff manual
+-     page: `docbook-to-man manpage.sgml > manpage.1'.  You may view
+-     the manual page with: `docbook-to-man manpage.sgml | nroff -man |
+-     less'.  A typical entry in a Makefile or Makefile.am is:
+-
+-manpage.1: manpage.sgml
+-	docbook-to-man $< > $@
+-
+-    
+-	The docbook-to-man binary is found in the docbook-to-man package.
+-	Please remember that if you create the nroff version in one of the
+-	debian/rules file targets (such as build), you will need to include
+-	docbook-to-man in your Build-Depends control field.
+-
+-  -->
+-
+-  <!ENTITY dhsection   "<manvolnum>1</manvolnum>">
+-  <!ENTITY dhucpackage "<refentrytitle>OPENBOX</refentrytitle>">
+-  <!ENTITY dhpackage   "openbox-gnome-session">
+-]>
+-
+-<refentry>
+-  <refmeta>
+-    &dhucpackage;
+-
+-    &dhsection;
+-  </refmeta>
+-  <refnamediv>
+-    <refname>&dhpackage;</refname>
+-
+-    <refpurpose>Run a GNOME session with Openbox as the window manager
+-      </refpurpose>
+-  </refnamediv>
+-  <refsect1>
+-    <title>DESCRIPTION</title>
+-
+-    <para><command>&dhpackage;</command> runs a GNOME session with
+-      Openbox as the window manager.</para>
+-
+-    <para><command>&dhpackage;</command> does not take any command line
+-      arguments.</para>
+-  </refsect1>
+-  <refsect1>
+-    <title>SEE ALSO</title>
+-
+-    <para>openbox(1), openbox-kde-session(1), openbox-session(1).
+-      </para>
+-
+-    <para>The program's full documentation is available on the website:
+-      <literal>http://openbox.org/</literal></para>
+-
+-    <para>Please report bugs to: <literal>http://bugzilla.icculus.org/
+-      </literal></para>
+-  </refsect1>
+-</refentry>
+-
+-<!-- Keep this comment at the end of the file
+-Local variables:
+-mode: sgml
+-sgml-omittag:t
+-sgml-shorttag:t
+-sgml-minimize-attributes:nil
+-sgml-always-quote-attributes:t
+-sgml-indent-step:2
+-sgml-indent-data:t
+-sgml-parent-document:nil
+-sgml-default-dtd-file:nil
+-sgml-exposed-tags:nil
+-sgml-local-catalogs:nil
+-sgml-local-ecat-files:nil
+-End:
+--->
+-
+-
+diff --git a/doc/openbox-kde-session.1.in b/home/faleh/openbox/doc/openbox-kde-session.1.in
+deleted file mode 100644
+index 9a96275..0000000
+--- a/doc/openbox-kde-session.1.in
++++ /dev/null
+@@ -1,22 +0,0 @@
+-.TH "OPENBOX" "1" 
+-.SH "NAME" 
+-openbox-kde-session \(em Run a KDE session with Openbox as the window manager 
+- 
+-.SH "DESCRIPTION" 
+-.PP 
+-\fBopenbox-kde-session\fR runs a KDE session with 
+-Openbox as the window manager. 
+-.PP 
+-\fBopenbox-kde-session\fR does not take any command line 
+-arguments. 
+-.SH "SEE ALSO" 
+-.PP 
+-openbox(1), openbox-gnome-session(1), openbox-session(1). 
+- 
+-.PP 
+-The program's full documentation is available on the website: 
+-\fBhttp://openbox.org/\fP 
+-.PP 
+-Please report bugs to: \fBhttp://bugzilla.icculus.org/ 
+-\fP 
+-.\" created by instant / docbook-to-man, Wed 06 Jan 2010, 13:40 
+diff --git a/doc/openbox-kde-session.1.sgml b/home/faleh/openbox/doc/openbox-kde-session.1.sgml
+deleted file mode 100644
+index 70c5117..0000000
+--- a/doc/openbox-kde-session.1.sgml
++++ /dev/null
+@@ -1,76 +0,0 @@
+-<!doctype refentry PUBLIC "-//OASIS//DTD DocBook V4.1//EN" [
+-
+-<!-- Process this file with docbook-to-man to generate an nroff manual
+-     page: `docbook-to-man manpage.sgml > manpage.1'.  You may view
+-     the manual page with: `docbook-to-man manpage.sgml | nroff -man |
+-     less'.  A typical entry in a Makefile or Makefile.am is:
+-
+-manpage.1: manpage.sgml
+-	docbook-to-man $< > $@
+-
+-    
+-	The docbook-to-man binary is found in the docbook-to-man package.
+-	Please remember that if you create the nroff version in one of the
+-	debian/rules file targets (such as build), you will need to include
+-	docbook-to-man in your Build-Depends control field.
+-
+-  -->
+-
+-  <!ENTITY dhsection   "<manvolnum>1</manvolnum>">
+-  <!ENTITY dhucpackage "<refentrytitle>OPENBOX</refentrytitle>">
+-  <!ENTITY dhpackage   "openbox-kde-session">
+-]>
+-
+-<refentry>
+-  <refmeta>
+-    &dhucpackage;
+-
+-    &dhsection;
+-  </refmeta>
+-  <refnamediv>
+-    <refname>&dhpackage;</refname>
+-
+-    <refpurpose>Run a KDE session with Openbox as the window manager
+-      </refpurpose>
+-  </refnamediv>
+-  <refsect1>
+-    <title>DESCRIPTION</title>
+-
+-    <para><command>&dhpackage;</command> runs a KDE session with
+-      Openbox as the window manager.</para>
+-
+-    <para><command>&dhpackage;</command> does not take any command line
+-      arguments.</para>
+-  </refsect1>
+-  <refsect1>
+-    <title>SEE ALSO</title>
+-
+-    <para>openbox(1), openbox-gnome-session(1), openbox-session(1).
+-      </para>
+-
+-    <para>The program's full documentation is available on the website:
+-      <literal>http://openbox.org/</literal></para>
+-
+-    <para>Please report bugs to: <literal>http://bugzilla.icculus.org/
+-      </literal></para>
+-  </refsect1>
+-</refentry>
+-
+-<!-- Keep this comment at the end of the file
+-Local variables:
+-mode: sgml
+-sgml-omittag:t
+-sgml-shorttag:t
+-sgml-minimize-attributes:nil
+-sgml-always-quote-attributes:t
+-sgml-indent-step:2
+-sgml-indent-data:t
+-sgml-parent-document:nil
+-sgml-default-dtd-file:nil
+-sgml-exposed-tags:nil
+-sgml-local-catalogs:nil
+-sgml-local-ecat-files:nil
+-End:
+--->
+-
+-
+diff --git a/tools/gdm-control/Makefile b/home/faleh/openbox/tools/gdm-control/Makefile
+deleted file mode 100644
+index cfc4653..0000000
+--- a/tools/gdm-control/Makefile
++++ /dev/null
+@@ -1,4 +0,0 @@
+-all clean install:
+-	$(MAKE) -C ../.. -$(MAKEFLAGS) $@
+-
+-.PHONY: all clean install
+diff --git a/tools/gdm-control/gdm-control.c b/home/faleh/openbox/tools/gdm-control/gdm-control.c
+deleted file mode 100644
+index db28841..0000000
+--- a/tools/gdm-control/gdm-control.c
++++ /dev/null
+@@ -1,295 +0,0 @@
+-#include <string.h>
+-#include <stdio.h>
+-#include <assert.h>
+-#include <errno.h>
+-#include <unistd.h>
+-#include <sys/socket.h>
+-#include <sys/un.h>
+-
+-#include <X11/Xlib.h>
+-#include <X11/Xauth.h>
+-
+-#include <glib.h>
+-
+-typedef enum
+-{
+-    INVALID,
+-    NONE,
+-    SHUTDOWN,
+-    REBOOT,
+-    SUSPEND,
+-    SWITCHUSER
+-} Action;
+-
+-#define GDM_PROTOCOL_SOCKET_PATH1 "/var/run/gdm_socket"
+-#define GDM_PROTOCOL_SOCKET_PATH2 "/tmp/.gdm_socket"
+-
+-#define GDM_PROTOCOL_MSG_CLOSE         "CLOSE"
+-#define GDM_PROTOCOL_MSG_VERSION       "VERSION"
+-#define GDM_PROTOCOL_MSG_AUTHENTICATE  "AUTH_LOCAL"
+-#define GDM_PROTOCOL_MSG_QUERY_ACTION  "QUERY_LOGOUT_ACTION"
+-#define GDM_PROTOCOL_MSG_SET_ACTION    "SET_SAFE_LOGOUT_ACTION"
+-#define GDM_PROTOCOL_MSG_FLEXI_XSERVER "FLEXI_XSERVER"
+-
+-#define GDM_ACTION_STR_NONE     GDM_PROTOCOL_MSG_SET_ACTION" NONE"
+-#define GDM_ACTION_STR_SHUTDOWN GDM_PROTOCOL_MSG_SET_ACTION" HALT"
+-#define GDM_ACTION_STR_REBOOT   GDM_PROTOCOL_MSG_SET_ACTION" REBOOT"
+-#define GDM_ACTION_STR_SUSPEND  GDM_PROTOCOL_MSG_SET_ACTION" SUSPEND"
+-
+-#define GDM_MIT_MAGIC_COOKIE_LEN 16
+-
+-static int fd = 0;
+-
+-static void gdm_disconnect()
+-{
+-    if (fd > 0)
+-        close(fd);
+-    fd = 0;
+-}
+-
+-static char* get_display_number(void)
+-{
+-    char *display_name;
+-    char *retval;
+-    char *p;
+-
+-    display_name = XDisplayName(NULL);
+-
+-    p = strchr(display_name, ':');
+-    if (!p)
+-        return g_strdup ("0");
+-
+-    while (*p == ':') p++;
+-
+-    retval = g_strdup (p);
+-
+-    p = strchr (retval, '.');
+-    if (p != NULL)
+-        *p = '\0';
+-
+-    return retval;
+-}
+-
+-static char* gdm_send_protocol_msg (const char *msg)
+-{
+-    GString *retval;
+-    char     buf[256];
+-    char    *p;
+-    int      len;
+-
+-    p = g_strconcat(msg, "\n", NULL);
+-    if (write (fd, p, strlen(p)) < 0) {
+-        g_free (p);
+-
+-        g_warning ("Failed to send message to GDM: %s",
+-                   g_strerror (errno));
+-        return NULL;
+-    }
+-    g_free (p);
+-
+-    p = NULL;
+-    retval = NULL;
+-    while ((len = read(fd, buf, sizeof(buf) - 1)) > 0) {
+-        buf[len] = '\0';
+-
+-        if (!retval)
+-            retval = g_string_new(buf);
+-        else
+-            retval = g_string_append(retval, buf);
+-
+-        if ((p = strchr(retval->str, '\n')))
+-            break;
+-    }
+-
+-    if (p) *p = '\0';
+-
+-    return retval ? g_string_free(retval, FALSE) : NULL;
+-}
+-
+-static gboolean gdm_authenticate()
+-{
+-    FILE       *f;
+-    Xauth      *xau;
+-    const char *xau_path;
+-    char       *display_number;
+-    gboolean    retval;
+-
+-    if (!(xau_path = XauFileName()))
+-        return FALSE;
+-
+-    if (!(f = fopen(xau_path, "r")))
+-        return FALSE;
+-
+-    retval = FALSE;
+-    display_number = get_display_number();
+-
+-    while ((xau = XauReadAuth(f))) {
+-        char  buffer[40]; /* 2*16 == 32, so 40 is enough */
+-        char *msg;
+-        char *response;
+-        int   i;
+-
+-        if (xau->family != FamilyLocal ||
+-            strncmp (xau->number, display_number, xau->number_length) ||
+-            strncmp (xau->name, "MIT-MAGIC-COOKIE-1", xau->name_length) ||
+-            xau->data_length != GDM_MIT_MAGIC_COOKIE_LEN)
+-        {
+-            XauDisposeAuth(xau);
+-            continue;
+-        }
+-
+-        for (i = 0; i < GDM_MIT_MAGIC_COOKIE_LEN; i++)
+-            g_snprintf(buffer + 2*i, 3, "%02x", (guint)(guchar)xau->data[i]);
+-
+-        XauDisposeAuth(xau);
+-
+-        msg = g_strdup_printf(GDM_PROTOCOL_MSG_AUTHENTICATE " %s", buffer);
+-        response = gdm_send_protocol_msg(msg);
+-        g_free (msg);
+-
+-        if (response && !strcmp(response, "OK")) {
+-            /*auth_cookie = g_strdup(buffer);*/
+-            g_free(response);
+-            retval = TRUE;
+-            break;
+-        }
+-
+-        g_free (response);
+-    }
+-
+-    fclose(f);
+-    return retval;
+-}
+-
+-static gboolean gdm_connect()
+-{
+-    struct sockaddr_un  addr;
+-    char               *response;
+-
+-    assert(fd <= 0);
+-
+-    fd = socket(AF_UNIX, SOCK_STREAM, 0);
+-    if (fd < 0) {
+-        g_warning("Failed to create GDM socket: %s", g_strerror (errno));
+-        gdm_disconnect();
+-        return FALSE;
+-    }
+-
+-    if (g_file_test(GDM_PROTOCOL_SOCKET_PATH1, G_FILE_TEST_EXISTS))
+-        strcpy(addr.sun_path, GDM_PROTOCOL_SOCKET_PATH1);
+-    else
+-        strcpy(addr.sun_path, GDM_PROTOCOL_SOCKET_PATH2);
+-
+-    addr.sun_family = AF_UNIX;
+-
+-    if (connect(fd, (struct sockaddr *) &addr, sizeof (addr)) < 0) {
+-        g_warning("Failed to establish a connection with GDM: %s",
+-                  g_strerror(errno));
+-        gdm_disconnect();
+-        return FALSE;
+-    }
+-
+-    response = gdm_send_protocol_msg(GDM_PROTOCOL_MSG_VERSION);
+-    if (!response || strncmp(response, "GDM ", strlen("GDM ") != 0)) {
+-        g_free(response);
+-
+-        g_warning("Failed to get protocol version from GDM");
+-        gdm_disconnect();
+-        return FALSE;
+-    }
+-    g_free(response);
+-
+-    if (!gdm_authenticate()) {
+-        g_warning("Failed to authenticate with GDM");
+-        gdm_disconnect();
+-        return FALSE;
+-    }
+-
+-    return TRUE;
+-}
+-
+-int main(int argc, char **argv)
+-{
+-    int i;
+-    Action a = INVALID;
+-
+-    for (i = 1; i < argc; ++i) {
+-        if (!strcmp(argv[i], "--help")) {
+-            a = INVALID;
+-            break;
+-        }
+-        if (!strcmp(argv[i], "--none")) {
+-            a = NONE;
+-            break;
+-        }
+-        if (!strcmp(argv[i], "--shutdown")) {
+-            a = SHUTDOWN;
+-            break;
+-        }
+-        if (!strcmp(argv[i], "--reboot")) {
+-            a = REBOOT;
+-            break;
+-        }
+-        if (!strcmp(argv[i], "--suspend")) {
+-            a = SUSPEND;
+-            break;
+-        }
+-        if (!strcmp(argv[i], "--switch-user")) {
+-            a = SWITCHUSER;
+-            break;
+-        }
+-    }
+-
+-    if (!a) {
+-        printf("Usage: gdm-control ACTION\n\n");
+-        printf("Actions:\n");
+-        printf("    --help        Display this help and exit\n");
+-        printf("    --none        Do nothing special when the current session ends\n");
+-        printf("    --shutdown    Shutdown the computer when the current session ends\n");
+-        printf("    --reboot      Reboot the computer when the current session ends\n");
+-        printf("    --suspend     Suspend the computer when the current session ends\n");
+-        printf("    --switch-user Log in as a new user (this works immediately)\n\n");
+-        return 0;
+-    }
+-
+-    {
+-        char *d, *response;
+-        const char *action_string;
+-
+-        d = XDisplayName(NULL);
+-        if (!d) {
+-            fprintf(stderr,
+-                    "Unable to find the X display specified by the DISPLAY "
+-                    "environment variable. Ensure that it is set correctly.");
+-            return 1;
+-        }
+-
+-        switch (a) {
+-        case NONE:
+-            action_string = GDM_ACTION_STR_NONE;
+-            break;
+-        case SHUTDOWN:
+-            action_string = GDM_ACTION_STR_SHUTDOWN;
+-            break;
+-        case REBOOT:
+-            action_string = GDM_ACTION_STR_REBOOT;
+-            break;
+-        case SUSPEND:
+-            action_string = GDM_ACTION_STR_SUSPEND;
+-            break;
+-        case SWITCHUSER:
+-            action_string = GDM_PROTOCOL_MSG_FLEXI_XSERVER;
+-            break;
+-        default:
+-            assert(0);
+-        }
+-
+-        if (gdm_connect()) {
+-            response = gdm_send_protocol_msg(action_string);
+-            g_free(response);
+-            gdm_disconnect();
+-        }
+-    }
+-
+-    return 0;
+-}
+diff --git a/tools/gnome-panel-control/Makefile b/home/faleh/openbox/tools/gnome-panel-control/Makefile
+deleted file mode 100644
+index cfc4653..0000000
+--- a/tools/gnome-panel-control/Makefile
++++ /dev/null
+@@ -1,4 +0,0 @@
+-all clean install:
+-	$(MAKE) -C ../.. -$(MAKEFLAGS) $@
+-
+-.PHONY: all clean install
+diff --git a/tools/gnome-panel-control/gnome-panel-control.c b/home/faleh/openbox/tools/gnome-panel-control/gnome-panel-control.c
+deleted file mode 100644
+index 67aa039..0000000
+--- a/tools/gnome-panel-control/gnome-panel-control.c
++++ /dev/null
+@@ -1,100 +0,0 @@
+-#include <X11/Xlib.h>
+-#include <string.h>
+-#include <stdio.h>
+-#include <assert.h>
+-
+-typedef enum
+-{
+-    NONE,
+-    MAIN_MENU,
+-    RUN_DIALOG
+-} Action;
+-
+-int main(int argc, char **argv)
+-{
+-    int i;
+-    Action a = NONE;
+-
+-    for (i = 1; i < argc; ++i) {
+-        if (!strcmp(argv[i], "--help")) {
+-            a = NONE;
+-            break;
+-        }
+-        if (!strcmp(argv[i], "--main-menu")) {
+-            a = MAIN_MENU;
+-            break;
+-        }
+-        if (!strcmp(argv[i], "--run-dialog")) {
+-            a = RUN_DIALOG;
+-            break;
+-        }
+-    }
+-
+-    if (!a) {
+-        printf("Usage: gnome-panel-control ACTION\n\n");
+-        printf("Actions:\n");
+-        printf("    --help       Display this help and exit\n");
+-        printf("    --main-menu  Show the main menu\n");
+-        printf("    --run-dialog Show the run dialog\n\n");
+-        return 0;
+-    }
+-
+-    {
+-        Display *d;
+-        Window root;
+-        XClientMessageEvent ce;
+-        Atom act_atom;
+-        Time timestamp;
+-
+-        d = XOpenDisplay(NULL);
+-        if (!d) {
+-            fprintf(stderr,
+-                    "Unable to open the X display specified by the DISPLAY "
+-                    "environment variable. Ensure you have permission to "
+-                    "connect to the display.");
+-            return 1;
+-        }
+-        root = RootWindowOfScreen(DefaultScreenOfDisplay(d));
+-
+-        switch (a) {
+-        case MAIN_MENU:
+-            act_atom = XInternAtom(d, "_GNOME_PANEL_ACTION_MAIN_MENU", False);
+-            break;
+-        case RUN_DIALOG:
+-            act_atom = XInternAtom(d, "_GNOME_PANEL_ACTION_RUN_DIALOG", False);
+-            break;
+-        default:
+-            assert(0);
+-        }
+-
+-        /* Generate a timestamp */
+-        {
+-            XEvent event;
+-            Window win;
+-
+-            win = XCreateSimpleWindow(d, root, 0, 0, 1, 1, 0, 0, 0);
+-
+-            XSelectInput(d, win, PropertyChangeMask);
+-
+-            XChangeProperty(d, win, act_atom, act_atom, 8,
+-                            PropModeAppend, NULL, 0);
+-            XWindowEvent(d, win, PropertyChangeMask, &event);
+-
+-            XDestroyWindow(d, win);
+-
+-            timestamp = event.xproperty.time;
+-        }
+-
+-        ce.type = ClientMessage;
+-        ce.window = root;
+-        ce.message_type = XInternAtom(d, "_GNOME_PANEL_ACTION", False);
+-        ce.format = 32;
+-        ce.data.l[0] = act_atom;
+-        ce.data.l[1] = timestamp;
+-        XSendEvent(d, root, False, StructureNotifyMask, (XEvent*) &ce);
+-
+-        XCloseDisplay(d);
+-    }
+-
+-    return 0;
+-}
