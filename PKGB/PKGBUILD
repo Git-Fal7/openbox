@@ -1,0 +1,46 @@
+pkgname=openbox
+pkgver=3.6.1
+pkgrel=8
+pkgdesc='Highly configurable and lightweight X11 window manager'
+arch=('x86_64')
+ogurl='http://openbox.org'
+url='https://github.com/git-fal7/openbox'
+license=('GPL')
+provides=(libobrender.so)
+depends=('startup-notification' 'libxml2' 'libxinerama' 'libxrandr'
+         'libxcursor' 'pango' 'imlib2' 'librsvg' 'libsm')
+groups=('lxde' 'lxde-gtk3' 'lxqt')
+backup=('etc/xdg/openbox/menu.xml' 'etc/xdg/openbox/rc.xml'
+        'etc/xdg/openbox/autostart' 'etc/xdg/openbox/environment')
+source=("$pkgname::git+$url")
+md5sums=('SKIP')
+
+prepare() {
+  cd $pkgname
+
+  git apply patches/remove-both.diff
+  git apply patches/openbox-xdg-autostart-gnome-kde.diff
+  
+  # Taken from https://sources.debian.org/data/main/o/openbox/3.6.1-9/debian/patches/887908.patch
+  # For https://bugs.archlinux.org/task/66738
+  patch -Np1 -i patches/debian-887908.patch
+  
+  # https://bugs.archlinux.org/task/72023
+  patch -Np1 -i patches/917204_undecorated_maximized_no_border.patch
+
+}
+
+build() {
+  cd $pkgname
+  ./configure --prefix=/usr \
+    --with-x \
+    --enable-startup-notification \
+    --sysconfdir=/etc \
+    --libexecdir=/usr/lib/openbox
+  make
+}
+
+package() {
+  cd $pkgname-$pkgver
+  make DESTDIR="$pkgdir" install
+}
