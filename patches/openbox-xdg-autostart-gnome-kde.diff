@@ -1,0 +1,431 @@
+diff --git a/Makefile.am b/Makefile.am
+index 205efb2..0c34a5a 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -30,7 +30,8 @@ lib_LTLIBRARIES = \
+ 
+ bin_PROGRAMS = \
+ 	openbox/openbox \
+-	tools/obxprop/obxprop
++	tools/obxprop/obxprop \
++	tools/openbox-xdg-autostart/openbox-xdg-autostart
+ 
+ noinst_PROGRAMS = \
+ 	obt/obt_unittests
+@@ -44,9 +45,6 @@ dist_rc_SCRIPTS = \
+ nodist_rc_SCRIPTS = \
+ 	data/autostart/autostart
+ 
+-dist_libexec_SCRIPTS = \
+-	data/autostart/openbox-xdg-autostart
+-
+ nodist_libexec_SCRIPTS = \
+ 	data/autostart/openbox-autostart
+ 
+@@ -333,6 +331,15 @@ tools_obxprop_obxprop_LDADD = \
+ tools_obxprop_obxprop_SOURCES = \
+ 	tools/obxprop/obxprop.c
+ 
++## openbox-xdg-autostart ##
++
++tools_openbox_xdg_autostart_openbox_xdg_autostart_CPPFLAGS = \
++	$(GLIB_CFLAGS)
++tools_openbox_xdg_autostart_openbox_xdg_autostart_LDADD = \
++	$(GLIB_LIBS)
++tools_openbox_xdg_autostart_openbox_xdg_autostart_SOURCES = \
++	tools/openbox-xdg-autostart/openbox-xdg-autostart.c
++
+ ## default button masks ##
+ dist_docxbm_DATA = \
+         data/xbm/bullet.xbm \
+diff --git a/data/autostart/openbox-autostart.in b/data/autostart/openbox-autostart.in
+index 5c72777..2f0d8f2 100755
+--- a/data/autostart/openbox-autostart.in
++++ b/data/autostart/openbox-autostart.in
+@@ -31,4 +31,4 @@ fi
+ # Run the XDG autostart stuff.  These are found in /etc/xdg/autostart and
+ # in $HOME/.config/autostart.  This requires PyXDG to be installed.
+ # See openbox-xdg-autostart --help for more details.
+-@libexecdir@/openbox-xdg-autostart "$@"
++openbox-xdg-autostart "$@"
+diff --git a/data/autostart/openbox-xdg-autostart b/openbox/data/autostart/openbox-xdg-autostart
+deleted file mode 100755
+index 04a17a1..0000000
+--- a/data/autostart/openbox-xdg-autostart
++++ /dev/null
+@@ -1,198 +0,0 @@
+-#!/usr/bin/env python
+-
+-# openbox-xdg-autostart runs things based on the XDG autostart specification
+-# Copyright (C) 2008       Dana Jansens
+-#
+-# XDG autostart specification can be found here:
+-# http://standards.freedesktop.org/autostart-spec/
+-#
+-#
+-#
+-# LICENSE:
+-#   This program is free software; you can redistribute it and/or modify
+-#   it under the terms of the GNU General Public License as published by
+-#   the Free Software Foundation; either version 2 of the License, or
+-#   (at your option) any later version.
+-#
+-#   This program is distributed in the hope that it will be useful,
+-#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+-#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-#   GNU General Public License for more details.
+-
+-ME="openbox-xdg-autostart"
+-VERSION="1.1"
+-
+-import os, glob, sys
+-try:
+-    from xdg import BaseDirectory
+-    from xdg.DesktopEntry import DesktopEntry
+-    from xdg.Exceptions import ParsingError
+-except ImportError:
+-    print
+-    print >>sys.stderr, "ERROR:", ME, "requires PyXDG to be installed"
+-    print
+-    sys.exit(1)
+-
+-def main(argv=sys.argv):
+-    if "--help" in argv[1:]:
+-        show_help()
+-        return 0
+-    if "--version" in argv[1:]:
+-        show_version()
+-        return 0
+-
+-    # get the autostart directories
+-    autodirs = BaseDirectory.load_config_paths("autostart")
+-
+-    # find all the autostart files
+-    files = []
+-    for dir in autodirs:
+-        for path in glob.glob(os.path.join(dir, '*.desktop')):
+-            try:
+-                autofile = AutostartFile(path)
+-            except ParsingError:
+-                print "Invalid .desktop file: " + path
+-            else:
+-                if not autofile in files:
+-                    files.append(autofile)
+-
+-    list = False
+-    if "--list" in argv[1:]:
+-        list = True
+-        argv.remove("--list")
+-
+-    # run them !
+-    environments = argv[1:]
+-    for autofile in files:
+-        if list: autofile.display(environments)
+-        else: autofile.run(environments)
+-
+-class AutostartFile:
+-    def __init__(self, path):
+-        self.path = path
+-        self.filename = os.path.basename(path)
+-        self.dirname = os.path.dirname(path)
+-        self.de = DesktopEntry(path)
+-
+-    def __eq__(self, other):
+-        return self.filename == other.filename
+-
+-    def __str__(self):
+-        return self.path + " : " + self.de.getName()
+-
+-    def _isexecfile(self, path):
+-        return os.access(path, os.X_OK)
+-
+-    def _findFile(self, path, search, match_func):
+-        # check empty path
+-        if not path: return None
+-        # check absolute path
+-        if path[0] == '/':
+-            if match_func(path): return path
+-            else: return None
+-        else:
+-            # check relative path
+-            for dirname in search.split(os.pathsep):
+-                if dirname != "":
+-                    candidate = os.path.join(dirname, path)
+-                    if (match_func(candidate)): return candidate
+-
+-    def _alert(self, str, info=False):
+-        if info:
+-            print "\t ", str
+-        else:
+-            print "\t*", str
+-
+-    def _showInEnvironment(self, envs, verbose=False):
+-        default = not self.de.getOnlyShowIn()
+-        noshow = False
+-        force = False
+-        for i in self.de.getOnlyShowIn():
+-            if i in envs: force = True
+-        for i in self.de.getNotShowIn():
+-            if i in envs: noshow = True
+-
+-        if verbose:
+-            if not default and not force:
+-                s = ""
+-                for i in self.de.getOnlyShowIn():
+-                    if s: s += ", "
+-                    s += i
+-                self._alert("Excluded by: OnlyShowIn (" + s + ")")
+-            if default and noshow and not force:
+-                s = ""
+-                for i in self.de.getNotShowIn():
+-                    if s: s += ", "
+-                    s += i
+-                self._alert("Excluded by: NotShowIn (" + s + ")")
+-        return (default and not noshow) or force
+-
+-    def _shouldRun(self, envs, verbose=False):
+-        if not self.de.getExec():
+-            if verbose: self._alert("Excluded by: Missing Exec field")
+-            return False
+-        if self.de.getHidden():
+-            if verbose: self._alert("Excluded by: Hidden")
+-            return False
+-        if self.de.getTryExec():
+-            if not self._findFile(self.de.getTryExec(), os.getenv("PATH"),
+-                                  self._isexecfile):
+-                if verbose: self._alert("Excluded by: TryExec (" +
+-                                        self.de.getTryExec() + ")")
+-                return False
+-        if not self._showInEnvironment(envs, verbose):
+-            return False
+-        return True
+-
+-    def display(self, envs):
+-        if self._shouldRun(envs):
+-            print "[*] " + self.de.getName()
+-        else:
+-            print "[ ] " + self.de.getName()
+-        self._alert("File: " + self.path, info=True)
+-        if self.de.getExec():
+-            self._alert("Executes: " + self.de.getExec(), info=True)
+-        self._shouldRun(envs, True)
+-        print
+-
+-    def run(self, envs):
+-        here = os.getcwd()
+-        if self.de.getPath():
+-            os.chdir(self.de.getPath())
+-        if self._shouldRun(envs):
+-            args = ["/bin/sh", "-c", "exec " + self.de.getExec()]
+-            os.spawnv(os.P_NOWAIT, args[0], args);
+-        os.chdir(here)
+-
+-def show_help():
+-    print "Usage:", ME, "[OPTION]... [ENVIRONMENT]..."
+-    print
+-    print "This tool will run xdg autostart .desktop files"
+-    print
+-    print "OPTIONS"
+-    print "  --list        Show a list of the files which would be run"
+-    print "                Files which would be run are marked with an asterix"
+-    print "                symbol [*].  For files which would not be run,"
+-    print "                information is given for why they are excluded"
+-    print "  --help        Show this help and exit"
+-    print "  --version     Show version and copyright information"
+-    print
+-    print "ENVIRONMENT specifies a list of environments for which to run autostart"
+-    print "applications.  If none are specified, only applications which do not "
+-    print "limit themselves to certain environments will be run."
+-    print
+-    print "ENVIRONMENT can be one or more of:"
+-    print "  GNOME         Gnome Desktop"
+-    print "  KDE           KDE Desktop"
+-    print "  ROX           ROX Desktop"
+-    print "  XFCE          XFCE Desktop"
+-    print "  Old           Legacy systems"
+-    print
+-
+-def show_version():
+-    print ME, VERSION
+-    print "Copyright (c) 2008        Dana Jansens"
+-    print
+-
+-if __name__ == "__main__":
+-        sys.exit(main())
+diff --git a/yes/openbox/tools/openbox-xdg-autostart/openbox-xdg-autostart.c b/tools/openbox-xdg-autostart/openbox-xdg-autostart.c
+new file mode 100644
+index 0000000..473f2ab
+--- /dev/null
++++ b/tools/openbox-xdg-autostart/openbox-xdg-autostart.c
+@@ -0,0 +1,171 @@
++/*
++ *      openbox-xdg-autostart.c - Handle autostart spec of freedesktop.org
++ *
++ *      Copyright 2008 PCMan <pcman.tw@gmail.com>
++ *      Copyright 2014 J. M. Becker <zilla@techzilla.info>
++ *
++ *      This program is free software; you can redistribute it and/or modify
++ *      it under the terms of the GNU General Public License as published by
++ *      the Free Software Foundation; either version 2 of the License, or
++ *      (at your option) any later version.
++ *
++ *      This program is distributed in the hope that it will be useful,
++ *      but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *      GNU General Public License for more details.
++ *
++ *      You should have received a copy of the GNU General Public License
++ *      along with this program; if not, write to the Free Software
++ *      Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
++ *      MA 02110-1301, USA.
++ */
++
++#include <glib.h>
++#include <stdio.h>
++#include <string.h>
++
++static const char DesktopEntry[] = "Desktop Entry";
++char* de_name;
++
++static void launch_autostart_file( const char* desktop_id, const char* desktop_file, GKeyFile* kf )
++{
++    if( g_key_file_load_from_file( kf, desktop_file, 0, NULL ) ) {
++        char* exec;
++        char** only_show_in, **not_show_in;
++        gsize n;
++
++        if( g_key_file_get_boolean( kf, DesktopEntry, "Hidden", NULL ) )
++            return;
++
++        /* check if this desktop entry is desktop-specific */
++        only_show_in = g_key_file_get_string_list( kf, DesktopEntry, "OnlyShowIn", &n, NULL );
++        if( only_show_in ) {
++            /* The format of this list is like:  OnlyShowIn=GNOME;XFCE */
++            gsize i = 0;
++            for( i = 0; i < n; ++i ) {
++                /* Only start this program if we are in the "OnlyShowIn" list */
++                if( 0 == strcmp( de_name, only_show_in[ i ] ) )
++                    break;
++            }
++            if( i >= n ) {  /* our session name is not found in the list */
++                g_strfreev( only_show_in );
++                return;   /* read next desktop file */
++            }
++            g_strfreev( only_show_in );
++        } else { /* OnlyShowIn and NotShowIn cannot be set at the same time. */
++            /* check if this desktop entry is not allowed in our session */
++            not_show_in = g_key_file_get_string_list( kf, DesktopEntry, "NotShowIn", &n, NULL );
++            if( not_show_in ) {
++                /* The format of this list is like:  NotShowIn=KDE;IceWM */
++                gsize i = 0;
++                for( i = 0; i < n; ++i ) {
++                    /* Only start this program if we are in the "OnlyShowIn" list */
++                    if( 0 == strcmp( de_name, not_show_in[ i ] ) )
++                        break;
++                }
++                if( i < n ) {  /* our session name is found in the "NotShowIn" list */
++                    g_strfreev( not_show_in );
++                    return;   /* read next desktop file */
++                }
++                g_strfreev( not_show_in );
++            }
++        }
++
++        exec = g_key_file_get_string( kf, DesktopEntry, "TryExec", NULL );
++        if( G_UNLIKELY(exec) ) { /* If we are asked to tryexec first */
++            if( ! g_path_is_absolute( exec ) ) {
++                char* full = g_find_program_in_path( exec );
++                g_free( exec );
++                exec = full;
++            }
++            /* If we cannot match the TryExec key with an installed executable program */
++            if( ! g_file_test( exec, G_FILE_TEST_IS_EXECUTABLE ) ) {
++                g_free( exec );
++                return;   /* bypass this desktop file, and read next */
++            }
++            g_free( exec );
++        }
++
++        /* get the real command line */
++        exec = g_key_file_get_string( kf, DesktopEntry, "Exec", NULL );
++        if( G_LIKELY(exec) ) {
++            /* according to the spec, the Exec command line should be translated
++             *  with some rules, but that's normally for file managers who needs to
++             *  pass selected file as arguments. The probability we need this is
++             *  very low, so just omit it.
++             */
++
++            /* FIXME: Exec key should be handled correctly */
++
++            /* launch the program */
++            if( g_spawn_command_line_async( exec, NULL ) ) {
++            }
++        }
++    }
++}
++
++static void get_autostart_files_in_dir( GHashTable* hash, const char* de_name, const char* base_dir )
++{
++    char* dir_path = g_build_filename( base_dir, "autostart", NULL );
++    GDir* dir = g_dir_open( dir_path, 0, NULL );
++
++    if( dir ) {
++        char *path;
++        const char *name;
++
++        while( (name = g_dir_read_name( dir )) != NULL ) {
++            if(g_str_has_suffix(name, ".desktop")) {
++                path = g_build_filename( dir_path, name, NULL );
++                g_hash_table_replace( hash, g_strdup(name), path );
++            }
++        }
++        g_dir_close( dir );
++    }
++    g_free( dir_path );
++}
++
++void xdg_autostart( const char* de_name )
++{
++    const char* const *dirs = g_get_system_config_dirs();
++    const char* const *dir;
++    GHashTable* hash = g_hash_table_new_full( g_str_hash, g_str_equal, g_free, g_free );
++
++    /* get system-wide autostart files */
++    for( dir = dirs; *dir; ++dir )
++        get_autostart_files_in_dir( hash, de_name, *dir );
++
++    /* get user-specific autostart files */
++    get_autostart_files_in_dir( hash, de_name, g_get_user_config_dir() );
++
++    if( g_hash_table_size( hash ) > 0 ) {
++        GKeyFile* kf = g_key_file_new();
++        g_hash_table_foreach( hash, (GHFunc)launch_autostart_file, kf );
++        g_key_file_free( kf );
++    }
++
++    g_hash_table_destroy( hash );
++}
++
++static void show_help()
++{
++    g_printf ("Run XDG autostart .desktop files.\n");
++    g_printf ("\n");
++    g_printf ("Usage:\n");
++    g_printf ("  xdg-autostart <DE_NAME>\n");
++    g_printf ("\n");
++}
++
++int main (int argc, char *argv[])
++{
++    if(argc<2) {
++        show_help ();
++        return 1;
++    }
++
++    de_name = g_strdup(argv[1]);
++
++    xdg_autostart (de_name);
++
++    g_free(de_name);
++    return 0;
++}
