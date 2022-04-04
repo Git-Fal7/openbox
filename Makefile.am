@@ -334,20 +334,6 @@ tools_obxprop_obxprop_LDADD = \
 tools_obxprop_obxprop_SOURCES = \
 	tools/obxprop/obxprop.c
 
-## gdm-control ##
-
-tools_gdm_control_gdm_control_CPPFLAGS = \
-	$(XAUTH_CFLAGS) \
-	$(X_CFLAGS) \
-	$(GLIB_CFLAGS)
-tools_gdm_control_gdm_control_LDADD = \
-	$(XAUTH_LIBS) \
-	$(X_LIBS) \
-	$(GLIB_LIBS)
-tools_gdm_control_gdm_control_SOURCES = \
-	tools/gdm-control/gdm-control.c
-
-
 ## default button masks ##
 dist_docxbm_DATA = \
         data/xbm/bullet.xbm \
