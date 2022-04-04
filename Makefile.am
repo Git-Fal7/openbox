@@ -41,8 +41,7 @@ noinst_PROGRAMS = \
 
 nodist_bin_SCRIPTS = \
 	data/xsession/openbox-session \
-	data/xsession/openbox-gnome-session \
-	data/xsession/openbox-kde-session
+	data/xsession/openbox-gnome-session 
 
 dist_rc_SCRIPTS = \
 	data/environment
@@ -536,8 +535,7 @@ dist_gnomewmfiles_DATA = \
 
 nodist_xsessions_DATA = \
 	data/xsession/openbox.desktop \
-	data/xsession/openbox-gnome.desktop \
-	data/xsession/openbox-kde.desktop
+	data/xsession/openbox-gnome.desktop 
 
 dist_gnomesession_DATA = \
 	data/gnome-session/openbox-gnome.session \
@@ -550,18 +548,14 @@ dist_noinst_DATA = \
 	data/autostart/openbox-autostart.in \
 	data/xsession/openbox.desktop.in \
 	data/xsession/openbox-gnome.desktop.in \
-	data/xsession/openbox-kde.desktop.in \
 	data/xsession/openbox-session.in \
 	data/xsession/openbox-gnome-session.in \
-	data/xsession/openbox-kde-session.in \
 	doc/openbox.1.sgml \
 	doc/openbox.1.in \
 	doc/openbox-session.1.sgml \
 	doc/openbox-session.1.in \
 	doc/openbox-gnome-session.1.sgml \
 	doc/openbox-gnome-session.1.in \
-	doc/openbox-kde-session.1.sgml \
-	doc/openbox-kde-session.1.in \
 	doc/obxprop.1.sgml \
 	doc/obxprop.1.in \
 	obrender/version.h.in \
@@ -600,7 +594,6 @@ nodist_man_MANS = \
 	doc/openbox.1 \
 	doc/openbox-session.1 \
 	doc/openbox-gnome-session.1 \
-	doc/openbox-kde-session.1 \
 	doc/obxprop.1
 
 EXTRA_DIST = \
