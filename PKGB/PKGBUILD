@@ -20,7 +20,7 @@ prepare() {
 
   git apply patches/remove-both.diff
   git apply patches/openbox-xdg-autostart-gnome-kde.diff
-  
+  git apply patches/Adwaita-Theme.diff
   # Taken from https://sources.debian.org/data/main/o/openbox/3.6.1-9/debian/patches/887908.patch
   # For https://bugs.archlinux.org/task/66738
   patch -Np1 -i patches/debian-887908.patch
