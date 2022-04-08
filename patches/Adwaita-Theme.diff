@@ -1,63 +1,114 @@
-diff --git a/themes/Adwaita/openbox-3/bullet.xbm b/themes/Adwaita/openbox-3/bullet.xbm
+diff --git a/b/Makefile.am b/a/Makefile.am
+index 4e86954..ee0dc94 100644
+--- a/b/Makefile.am
++++ b/a/Makefile.am
+@@ -13,7 +13,7 @@ pixmapdir       = $(datadir)/pixmaps
+ xsddir          = $(datadir)/openbox
+ appsdir         = $(datadir)/applications
+ 
+-theme = Clearlooks
++theme = Adwaita-Dark
+ 
+ AUTOMAKE_OPTIONS = subdir-objects foreign
+ 
+@@ -351,6 +351,24 @@ clearlooks_themedir = $(themedir)/Clearlooks/openbox-3
+ dist_clearlooks_theme_DATA= \
+ 	themes/Clearlooks/openbox-3/themerc
+ 
++adwaita_themedir = $(themedir)/Adwaita/openbox-3
++dist_adwaita_theme_DATA= \
++	themes/Adwaita/openbox-3/themerc \
++	themes/Adwaita/openbox-3/bullet.xbm \
++	themes/Adwaita/openbox-3/close.xbm \
++	themes/Adwaita/openbox-3/iconify.xbm \
++	themes/Adwaita/openbox-3/max.xbm \
++	themes/Adwaita/openbox-3/max_toggled.xbm
++
++adwaita_dark_themedir = $(themedir)/Adwaita-Dark/openbox-3
++dist_adwaita_dark_theme_DATA= \
++	themes/Adwaita-Dark/openbox-3/themerc \
++	themes/Adwaita-Dark/openbox-3/bullet.xbm \
++	themes/Adwaita-Dark/openbox-3/close.xbm \
++	themes/Adwaita-Dark/openbox-3/iconify.xbm \
++	themes/Adwaita-Dark/openbox-3/max.xbm \
++	themes/Adwaita-Dark/openbox-3/max_toggled.xbm
++
+ ## public headers ##
+ 
+ rrpubinclude_HEADERS = \
+diff --git a/b/data/rc.xml b/a/data/rc.xml
+index 3e5554b..c531efd 100644
+--- a/b/data/rc.xml
++++ b/a/data/rc.xml
+@@ -49,7 +49,7 @@
+ </placement>
+ 
+ <theme>
+-  <name>Clearlooks</name>
++  <name>Adwaita-Dark</name>
+   <titleLayout>NLIMC</titleLayout>
+   <!--
+       available characters are NDSLIMC, each can occur at most once.
+diff --git a/a/themes/Adwaita/openbox-3/bullet.xbm b/a/themes/Adwaita/openbox-3/bullet.xbm
 new file mode 100644
 index 0000000..4d1b72d
 --- /dev/null
-+++ b/themes/Adwaita/openbox-3/bullet.xbm
++++ b/a/themes/Adwaita/openbox-3/bullet.xbm
 @@ -0,0 +1,5 @@
 +#define bullet_width 11
 +#define bullet_height 11
 +static unsigned char bullet_bits[] = {
 +   0x00, 0x00, 0x00, 0x00, 0x20, 0x00, 0x60, 0x00, 0xe0, 0x00, 0xe0, 0x01,
 +   0xe0, 0x00, 0x60, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00, 0x00 };
-diff --git a/themes/Adwaita/openbox-3/close.xbm b/themes/Adwaita/openbox-3/close.xbm
+diff --git a/a/themes/Adwaita/openbox-3/close.xbm b/a/themes/Adwaita/openbox-3/close.xbm
 new file mode 100644
 index 0000000..cc6031f
 --- /dev/null
-+++ b/themes/Adwaita/openbox-3/close.xbm
++++ b/a/themes/Adwaita/openbox-3/close.xbm
 @@ -0,0 +1,5 @@
 +#define close_width 12
 +#define close_height 12
 +static unsigned char close_bits[] = {
 +   0x00, 0x00, 0x06, 0x06, 0x0e, 0x07, 0x9c, 0x03, 0xf8, 0x01, 0xf0, 0x00,
 +   0xf0, 0x00, 0xf8, 0x01, 0x9c, 0x03, 0x0e, 0x07, 0x06, 0x06, 0x00, 0x00 };
-diff --git a/themes/Adwaita/openbox-3/iconify.xbm b/themes/Adwaita/openbox-3/iconify.xbm
+diff --git a/a/themes/Adwaita/openbox-3/iconify.xbm b/a/themes/Adwaita/openbox-3/iconify.xbm
 new file mode 100644
 index 0000000..28610e8
 --- /dev/null
-+++ b/themes/Adwaita/openbox-3/iconify.xbm
++++ b/a/themes/Adwaita/openbox-3/iconify.xbm
 @@ -0,0 +1,5 @@
 +#define iconify_width 12
 +#define iconify_height 12
 +static unsigned char iconify_bits[] = {
 +   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xff, 0x0f,
 +   0xff, 0x0f, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
-diff --git a/themes/Adwaita/openbox-3/max.xbm b/themes/Adwaita/openbox-3/max.xbm
+diff --git a/a/themes/Adwaita/openbox-3/max.xbm b/a/themes/Adwaita/openbox-3/max.xbm
 new file mode 100644
 index 0000000..3f3d0df
 --- /dev/null
-+++ b/themes/Adwaita/openbox-3/max.xbm
++++ b/a/themes/Adwaita/openbox-3/max.xbm
 @@ -0,0 +1,5 @@
 +#define max_width 12
 +#define max_height 12
 +static unsigned char max_bits[] = {
 +   0x00, 0x00, 0xff, 0x0f, 0xff, 0x0f, 0x03, 0x0c, 0x03, 0x0c, 0x03, 0x0c,
 +   0x03, 0x0c, 0x03, 0x0c, 0x03, 0x0c, 0xff, 0x0f, 0xff, 0x0f, 0x00, 0x00 };
-diff --git a/themes/Adwaita/openbox-3/max_toggled.xbm b/themes/Adwaita/openbox-3/max_toggled.xbm
+diff --git a/a/themes/Adwaita/openbox-3/max_toggled.xbm b/a/themes/Adwaita/openbox-3/max_toggled.xbm
 new file mode 100644
 index 0000000..8dc06ae
 --- /dev/null
-+++ b/themes/Adwaita/openbox-3/max_toggled.xbm
++++ b/a/themes/Adwaita/openbox-3/max_toggled.xbm
 @@ -0,0 +1,5 @@
 +#define max_toggled_width 12
 +#define max_toggled_height 12
 +static unsigned char max_toggled_bits[] = {
 +   0x00, 0x00, 0xfc, 0x0f, 0xfc, 0x0f, 0x0c, 0x0c, 0xff, 0x0d, 0xff, 0x0d,
 +   0x83, 0x0d, 0x83, 0x0f, 0x83, 0x0f, 0xff, 0x01, 0xff, 0x01, 0x00, 0x00 };
-diff --git a/themes/Adwaita/openbox-3/themerc b/themes/Adwaita/openbox-3/themerc
+diff --git a/a/themes/Adwaita/openbox-3/themerc b/a/themes/Adwaita/openbox-3/themerc
 new file mode 100644
-index 0000000..a34817b
+index 0000000..0a8b958
 --- /dev/null
-+++ b/themes/Adwaita/openbox-3/themerc
++++ b/a/themes/Adwaita/openbox-3/themerc
 @@ -0,0 +1,193 @@
 +!! MENU SETTINGS......................................
 +
@@ -252,66 +303,66 @@ index 0000000..a34817b
 +window.inactive.label.text.font:shadow=n:shadowtint=10:shadowoffset=1
 +menu.items.font:
 +menu.title.text.font:shadow=n:shadowtint=0
-diff --git a/themes/Adwaita-Dark/openbox-3/bullet.xbm b/themes/Adwaita-Dark/openbox-3/bullet.xbm
+diff --git a/a/themes/Adwaita-Dark/openbox-3/bullet.xbm b/a/themes/Adwaita-Dark/openbox-3/bullet.xbm
 new file mode 100644
 index 0000000..4d1b72d
 --- /dev/null
-+++ b/themes/Adwaita-Dark/openbox-3/bullet.xbm
++++ b/a/themes/Adwaita-Dark/openbox-3/bullet.xbm
 @@ -0,0 +1,5 @@
 +#define bullet_width 11
 +#define bullet_height 11
 +static unsigned char bullet_bits[] = {
 +   0x00, 0x00, 0x00, 0x00, 0x20, 0x00, 0x60, 0x00, 0xe0, 0x00, 0xe0, 0x01,
 +   0xe0, 0x00, 0x60, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00, 0x00 };
-diff --git a/themes/Adwaita-Dark/openbox-3/close.xbm b/themes/Adwaita-Dark/openbox-3/close.xbm
+diff --git a/a/themes/Adwaita-Dark/openbox-3/close.xbm b/a/themes/Adwaita-Dark/openbox-3/close.xbm
 new file mode 100644
 index 0000000..cc6031f
 --- /dev/null
-+++ b/themes/Adwaita-Dark/openbox-3/close.xbm
++++ b/a/themes/Adwaita-Dark/openbox-3/close.xbm
 @@ -0,0 +1,5 @@
 +#define close_width 12
 +#define close_height 12
 +static unsigned char close_bits[] = {
 +   0x00, 0x00, 0x06, 0x06, 0x0e, 0x07, 0x9c, 0x03, 0xf8, 0x01, 0xf0, 0x00,
 +   0xf0, 0x00, 0xf8, 0x01, 0x9c, 0x03, 0x0e, 0x07, 0x06, 0x06, 0x00, 0x00 };
-diff --git a/themes/Adwaita-Dark/openbox-3/iconify.xbm b/themes/Adwaita-Dark/openbox-3/iconify.xbm
+diff --git a/a/themes/Adwaita-Dark/openbox-3/iconify.xbm b/a/themes/Adwaita-Dark/openbox-3/iconify.xbm
 new file mode 100644
 index 0000000..28610e8
 --- /dev/null
-+++ b/themes/Adwaita-Dark/openbox-3/iconify.xbm
++++ b/a/themes/Adwaita-Dark/openbox-3/iconify.xbm
 @@ -0,0 +1,5 @@
 +#define iconify_width 12
 +#define iconify_height 12
 +static unsigned char iconify_bits[] = {
 +   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xff, 0x0f,
 +   0xff, 0x0f, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
-diff --git a/themes/Adwaita-Dark/openbox-3/max.xbm b/themes/Adwaita-Dark/openbox-3/max.xbm
+diff --git a/a/themes/Adwaita-Dark/openbox-3/max.xbm b/a/themes/Adwaita-Dark/openbox-3/max.xbm
 new file mode 100644
 index 0000000..3f3d0df
 --- /dev/null
-+++ b/themes/Adwaita-Dark/openbox-3/max.xbm
++++ b/a/themes/Adwaita-Dark/openbox-3/max.xbm
 @@ -0,0 +1,5 @@
 +#define max_width 12
 +#define max_height 12
 +static unsigned char max_bits[] = {
 +   0x00, 0x00, 0xff, 0x0f, 0xff, 0x0f, 0x03, 0x0c, 0x03, 0x0c, 0x03, 0x0c,
 +   0x03, 0x0c, 0x03, 0x0c, 0x03, 0x0c, 0xff, 0x0f, 0xff, 0x0f, 0x00, 0x00 };
-diff --git a/themes/Adwaita-Dark/openbox-3/max_toggled.xbm b/themes/Adwaita-Dark/openbox-3/max_toggled.xbm
+diff --git a/a/themes/Adwaita-Dark/openbox-3/max_toggled.xbm b/a/themes/Adwaita-Dark/openbox-3/max_toggled.xbm
 new file mode 100644
 index 0000000..8dc06ae
 --- /dev/null
-+++ b/themes/Adwaita-Dark/openbox-3/max_toggled.xbm
++++ b/a/themes/Adwaita-Dark/openbox-3/max_toggled.xbm
 @@ -0,0 +1,5 @@
 +#define max_toggled_width 12
 +#define max_toggled_height 12
 +static unsigned char max_toggled_bits[] = {
 +   0x00, 0x00, 0xfc, 0x0f, 0xfc, 0x0f, 0x0c, 0x0c, 0xff, 0x0d, 0xff, 0x0d,
 +   0x83, 0x0d, 0x83, 0x0f, 0x83, 0x0f, 0xff, 0x01, 0xff, 0x01, 0x00, 0x00 };
-diff --git a/themes/Adwaita-Dark/openbox-3/themerc b/themes/Adwaita-Dark/openbox-3/themerc
+diff --git a/a/themes/Adwaita-Dark/openbox-3/themerc b/a/themes/Adwaita-Dark/openbox-3/themerc
 new file mode 100644
-index 0000000..d395da9
+index 0000000..c7e97ad
 --- /dev/null
-+++ b/themes/Adwaita-Dark/openbox-3/themerc
++++ b/a/themes/Adwaita-Dark/openbox-3/themerc
 @@ -0,0 +1,181 @@
 +!! MENU SETTINGS......................................
 +
