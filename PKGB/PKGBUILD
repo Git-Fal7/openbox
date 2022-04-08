@@ -18,7 +18,7 @@ md5sums=('SKIP')
 prepare() {
   cd $pkgname
 
-  git apply patches/remove-both.diff
+  git apply patches/AIO.diff
   git apply patches/openbox-xdg-autostart-gnome-kde.diff
   git apply patches/Adwaita-Theme.diff
   git apply patches/openbox-window-snap.diff
