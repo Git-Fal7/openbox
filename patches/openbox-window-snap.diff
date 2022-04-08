@@ -82,13 +82,13 @@ index d12a64de..1a2c40b3 100644
 +
 +    if (moveresize_client->snapped_left) {
 +        cur_x = 0;
-+        cur_y = 0;
++        cur_y = 25;
 +        cur_w = (width / 2) - 1;
 +        cur_h = height;
 +    }
 +    else if (moveresize_client->snapped_right) {
 +        cur_x = width / 2;
-+        cur_y = 0;
++        cur_y = 25;
 +        cur_w = width / 2;
 +        cur_h = height;
 +    }
